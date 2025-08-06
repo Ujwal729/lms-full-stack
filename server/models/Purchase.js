@@ -8,7 +8,7 @@ const PurchaseSchema = new mongoose.Schema(
       required: true,
     },
     userId: {
-      type: String, // 👈 Must be String to match User._id
+      type: String, 
       ref: "User",
       required: true,
     },

@@ -38,7 +38,6 @@ export const purchaseCourse = async (req, res) => {
     const { origin } = req.headers;
     const userId = req.auth.userId;
 
-    // Get user and course data
     const userData = await User.findById(userId);
     const courseData = await Course.findById(courseId);
 
@@ -46,7 +45,6 @@ export const purchaseCourse = async (req, res) => {
       return res.json({ success: false, message: "User or Course not found" });
     }
 
-    // Check if course already purchased by user
     const alreadyPurchased = await Purchase.findOne({
       userId: userData._id,
       courseId: courseData._id,
@@ -60,7 +58,6 @@ export const purchaseCourse = async (req, res) => {
       });
     }
 
-    // Calculate discounted amount
     const discountedAmount = parseFloat(
       (
         courseData.coursePrice -
@@ -68,7 +65,6 @@ export const purchaseCourse = async (req, res) => {
       ).toFixed(2)
     );
 
-    // Create a new Purchase with status = "pending"
     const newPurchase = await Purchase.create({
       courseId: courseData._id,
       userId: userData._id,
@@ -76,9 +72,8 @@ export const purchaseCourse = async (req, res) => {
       status: "pending",
     });
 
-    // Stripe checkout
     const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
-    const currency = process.env.CURRENCY?.toLowerCase() || "usd"; // default fallback
+    const currency = process.env.CURRENCY?.toLowerCase() || "usd";
 
     const session = await stripeInstance.checkout.sessions.create({
       success_url: `${origin}/loading/my-enrollments`,
